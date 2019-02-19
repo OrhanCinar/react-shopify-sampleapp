@@ -7,6 +7,7 @@ const session = require("koa-session");
 require("isomorphic-fetch");
 dotenv.config();
 
+const { default: graphQLProxy } = require("@shopify/koa-shopify-graphql-proxy");
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -33,8 +34,8 @@ app.prepare().then(() => {
     })
   );
 
+  server.use(graphQLProxy());
   server.use(verifyRequest());
-
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
