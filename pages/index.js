@@ -1,24 +1,51 @@
-import { EmptyState, Layout, Page, TextStyle } from "@shopify/polaris";
+import React, { Component } from "react";
+import {
+  EmptyState,
+  Layout,
+  Page,
+  TextStyle,
+  ResourcePicker
+} from "@shopify/polaris";
 
-const Index = () => (
-  <Page
-    primaryAction={{
-      content: "Select products"
-    }}
-  >
-    <Layout>
-      <EmptyState
-        heading="Discount your products temporarily"
-        action={{
+class Index extends Component {
+  state = { open: false };
+
+  handleSelection = resource => {
+    const idsFromResources = resource.selection.map(product => product.id);
+    this.setState({ open: false });
+    console.log(resource);
+  };
+
+  render() {
+    return (
+      <Page
+        primaryAction={{
           content: "Select products",
-          onAction: () => console.log(clicked)
+          onAction: () => this.setState({ open: true })
         }}
-        image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
       >
-        <p>Select products to change their price temporarily</p>
-      </EmptyState>
-    </Layout>
-  </Page>
-);
+        <ResourcePicker
+          resourceType="Product"
+          showVariants={false}
+          open={this.state.open}
+          onSelection={resource => this.handleSelection(resource)}
+          onCancel={() => this.setState({ open: false })}
+        />
+        <Layout>
+          <EmptyState
+            heading="Discount your products temporarily"
+            action={{
+              content: "Select products",
+              onAction: () => this.setState({ open: true })
+            }}
+            image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
+          >
+            <p>Select products to change their price temporarily</p>
+          </EmptyState>
+        </Layout>
+      </Page>
+    );
+  }
+}
 
 export default Index;
