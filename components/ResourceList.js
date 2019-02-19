@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import { Query } from "react-apollo";
 import { Card } from "@shopify/polaris";
+import store from "store-js";
 
 const GET_PRODUCTS_BY_ID = gql`
   query getProducts($ids: [ID!]!) {
@@ -35,7 +36,7 @@ class ResourceListWithProducts extends React.Component {
   state = {};
   render() {
     return (
-      <Query query={GET_PRODUCTS_BY_ID}>
+      <Query query={GET_PRODUCTS_BY_ID} variables={{ ids: store.get("ids") }}>
         {({ data, loading, error }) => {
           if (loading) return <div>Loading…</div>;
           if (error) return <div>{error.message}</div>;

@@ -6,6 +6,8 @@ import {
   TextStyle,
   ResourcePicker
 } from "@shopify/polaris";
+import store from "store-js";
+import ResourceListWithProducts from "../components/ResourceList";
 
 class Index extends Component {
   state = { open: false };
@@ -13,7 +15,8 @@ class Index extends Component {
   handleSelection = resource => {
     const idsFromResources = resource.selection.map(product => product.id);
     this.setState({ open: false });
-    console.log(resource);
+    console.log("resource", resource);
+    store.set("ids", idsFromResources);
   };
 
   render() {
@@ -42,6 +45,8 @@ class Index extends Component {
           >
             <p>Select products to change their price temporarily</p>
           </EmptyState>
+
+          <ResourceListWithProducts />
         </Layout>
       </Page>
     );
