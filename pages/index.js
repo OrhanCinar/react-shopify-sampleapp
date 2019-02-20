@@ -20,6 +20,8 @@ class Index extends Component {
   };
 
   render() {
+    const emptyState = !store.get("ids");
+
     return (
       <Page
         primaryAction={{
@@ -34,20 +36,22 @@ class Index extends Component {
           onSelection={resource => this.handleSelection(resource)}
           onCancel={() => this.setState({ open: false })}
         />
-        <Layout>
-          <EmptyState
-            heading="Discount your products temporarily"
-            action={{
-              content: "Select products",
-              onAction: () => this.setState({ open: true })
-            }}
-            image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
-          >
-            <p>Select products to change their price temporarily</p>
-          </EmptyState>
-
+        {emptyState ? (
+          <Layout>
+            <EmptyState
+              heading="Discount your products temporarily"
+              action={{
+                content: "Select products",
+                onAction: () => this.setState({ open: true })
+              }}
+              image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
+            >
+              <p>Select products to change their price temporarily</p>
+            </EmptyState>
+          </Layout>
+        ) : (
           <ResourceListWithProducts />
-        </Layout>
+        )}
       </Page>
     );
   }
