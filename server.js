@@ -8,6 +8,8 @@ require("isomorphic-fetch");
 
 const Router = require("koa-router");
 const processPayment = require("./server/router");
+const validateWebhook = require("./server/webhooks");
+const bodyParser = require("koa-bodyparser");
 
 dotenv.config();
 
@@ -25,6 +27,9 @@ app.prepare().then(() => {
 
   server.use(session(server));
   server.keys = [SHOPIFY_API_SECRET_KEY];
+
+  //webhook route
+  router.post("/webhooks/products/create", validateWebhook);
 
   //payment check route
   router.get("/", processPayment);
@@ -48,6 +53,15 @@ app.prepare().then(() => {
             test: true
           }
         });
+
+        const stringifiedWebhookParams = JSON.stringify({
+          webhook: {
+            topic: "products/create",
+            address: `${TUNNEL_URL}/webhooks/products/create`,
+            format: "json"
+          }
+        });
+
         const options = {
           method: "POST",
           body: stringifiedBillingParams,
@@ -57,6 +71,23 @@ app.prepare().then(() => {
             "Content-Type": "application/json"
           }
         };
+
+        //webhook options
+        const webhookOptions = {
+          method: "POST",
+          body: stringifiedWebhookParams,
+          credentials: "include",
+          headers: {
+            "X-Shopify-Access-Token": accessToken,
+            "Content-Type": "application/json"
+          }
+        };
+        fetch(`https://${shop}/admin/webhooks.json`, webhookOptions)
+          .then(response => response.json())
+          .then(jsonData =>
+            console.log("webhook response", JSON.stringify(jsonData))
+          )
+          .catch(error => console.log("webhook error", error));
 
         //redirect to app
         console.log("We did it!", shop, accessToken);
